@@ -31,7 +31,7 @@
         h1 { font-size: 2.2rem; font-weight: 900; margin: 0; letter-spacing: -1.5px; }
         .subtitle { font-size: 0.9rem; color: #bbb; margin-bottom: 30px; font-weight: 500; }
         
-        .label-group { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
+        .label-group { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #999; margin-bottom: 8px; text-transform: uppercase; }
 
         textarea {
             width: 100%;
@@ -45,11 +45,12 @@
             resize: none;
             outline: none;
             margin-bottom: 20px;
-            color: var(--main);
+            color: var(--main); /* 視認性を確保 (#333) */
         }
+        textarea::placeholder { color: #ccc; }
 
         /* Picker Section */
-        .picker-section { display: none; margin-bottom: 25px; text-align: left; }
+        #pickerArea { display: none; margin-bottom: 25px; text-align: left; }
         #keyContainer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .key-chip {
             padding: 10px 15px;
@@ -131,9 +132,9 @@
     <p class="subtitle">Extract specific keys from your JSON data.</p>
 
     <div class="label-group"><span>Paste JSON Here</span></div>
-    <textarea id="input" placeholder='{"id":1, "status":"ok"}' oninput="analyze()"></textarea>
+    <textarea id="input" placeholder='Paste your JSON here...' oninput="autoAnalyze()"></textarea>
 
-    <div id="pickerArea" class="picker-section">
+    <div id="pickerArea">
         <div class="label-group"><span>Pick Keys</span></div>
         <div id="keyContainer"></div>
     </div>
@@ -169,9 +170,10 @@
     let rawData = null;
     let selectedKeys = new Set();
 
-    function analyze() {
+    function autoAnalyze() {
         const val = document.getElementById('input').value.trim();
-        if(!val) return;
+        const picker = document.getElementById('pickerArea');
+        if(!val) { picker.style.display = 'none'; return; }
         try {
             rawData = JSON.parse(val);
             const sample = Array.isArray(rawData) ? rawData[0] : rawData;
@@ -186,15 +188,15 @@
                 chip.onclick = () => {
                     chip.classList.toggle('selected');
                     selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key);
-                    render();
+                    updateOutput();
                 };
                 container.appendChild(chip);
             });
-            document.getElementById('pickerArea').style.display = 'block';
-        } catch(e) {}
+            picker.style.display = 'block';
+        } catch(e) { picker.style.display = 'none'; }
     }
 
-    function render() {
+    function updateOutput() {
         if(!rawData) return;
         const process = (obj) => {
             let res = {};
@@ -210,7 +212,7 @@
         if(!out.value) return;
         out.select();
         document.execCommand('copy');
-        alert('Copied Result!');
+        alert('Copied picked JSON!');
     }
 
     function toggleModal(show) {
