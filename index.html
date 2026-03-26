@@ -8,10 +8,10 @@
     <style>
         :root {
             --bg: #fff;
-            --main: #111;
+            --main: #333;
             --accent: #eee;
-            --radius: 15px;
             --input-bg: #fafafa;
+            --radius: 15px;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
@@ -35,7 +35,7 @@
 
         textarea {
             width: 100%;
-            height: 160px;
+            height: 180px;
             padding: 20px;
             border: none;
             border-radius: var(--radius);
@@ -44,10 +44,11 @@
             font-size: 14px;
             resize: none;
             outline: none;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            color: var(--main);
         }
 
-        /* Key Picker Area */
+        /* Picker Section */
         .picker-section { display: none; margin-bottom: 25px; text-align: left; }
         #keyContainer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .key-chip {
@@ -57,6 +58,7 @@
             font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
+            color: var(--main);
         }
         .key-chip.selected { background: var(--main); color: #fff; }
 
@@ -97,7 +99,7 @@
             cursor: pointer;
         }
 
-        /* Modal Structure */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -115,13 +117,7 @@
             text-align: left;
             position: relative;
         }
-        .modal-close {
-            position: absolute;
-            top: 20px; right: 20px;
-            font-size: 1.5rem;
-            color: #ccc;
-            cursor: pointer;
-        }
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; color: #ccc; cursor: pointer; }
         .modal-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .modal-text { font-size: 0.9rem; color: #666; margin-bottom: 20px; line-height: 1.4; }
 
@@ -132,10 +128,10 @@
 
 <div class="container">
     <h1>JSON Key Picker</h1>
-    <p class="subtitle">Select specific keys from your JSON.</p>
+    <p class="subtitle">Extract specific keys from your JSON data.</p>
 
     <div class="label-group"><span>Paste JSON Here</span></div>
-    <textarea id="inputArea" placeholder='{"id":1, "status":"ok"}' oninput="analyze()"></textarea>
+    <textarea id="input" placeholder='{"id":1, "status":"ok"}' oninput="analyze()"></textarea>
 
     <div id="pickerArea" class="picker-section">
         <div class="label-group"><span>Pick Keys</span></div>
@@ -143,7 +139,7 @@
     </div>
 
     <div class="label-group"><span>Result</span></div>
-    <textarea id="outputArea" readonly placeholder="Result will appear here..."></textarea>
+    <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
 
     <div class="btn-group">
         <button class="btn btn-sub" onclick="location.reload()">Clear</button>
@@ -174,7 +170,7 @@
     let selectedKeys = new Set();
 
     function analyze() {
-        const val = document.getElementById('inputArea').value.trim();
+        const val = document.getElementById('input').value.trim();
         if(!val) return;
         try {
             rawData = JSON.parse(val);
@@ -190,7 +186,7 @@
                 chip.onclick = () => {
                     chip.classList.toggle('selected');
                     selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key);
-                    updateOutput();
+                    render();
                 };
                 container.appendChild(chip);
             });
@@ -198,7 +194,7 @@
         } catch(e) {}
     }
 
-    function updateOutput() {
+    function render() {
         if(!rawData) return;
         const process = (obj) => {
             let res = {};
@@ -206,15 +202,15 @@
             return res;
         };
         const result = Array.isArray(rawData) ? rawData.map(process) : process(rawData);
-        document.getElementById('outputArea').value = selectedKeys.size ? JSON.stringify(result, null, 2) : '';
+        document.getElementById('output').value = selectedKeys.size ? JSON.stringify(result, null, 2) : '';
     }
 
     function copyResult() {
-        const out = document.getElementById('outputArea');
+        const out = document.getElementById('output');
         if(!out.value) return;
         out.select();
         document.execCommand('copy');
-        alert('Copied!');
+        alert('Copied Result!');
     }
 
     function toggleModal(show) {
