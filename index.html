@@ -45,11 +45,14 @@
             resize: none;
             outline: none;
             margin-bottom: 20px;
-            color: var(--main); /* 視認性を確保 (#333) */
+            /* iPhone用・視認性強制強化設定 */
+            color: var(--main) !important;
+            opacity: 1 !important; /* 透過を防止 */
+            -webkit-appearance: none; /* 標準スタイルを解除 */
+            -webkit-text-fill-color: var(--main); /* 文字色を強制固定 */
         }
-        textarea::placeholder { color: #ccc; }
+        textarea::placeholder { color: #aaa; opacity: 1; -webkit-text-fill-color: #aaa; }
 
-        /* Picker Section */
         #pickerArea { display: none; margin-bottom: 25px; text-align: left; }
         #keyContainer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .key-chip {
@@ -60,8 +63,9 @@
             font-weight: 700;
             cursor: pointer;
             color: var(--main);
+            -webkit-text-fill-color: var(--main);
         }
-        .key-chip.selected { background: var(--main); color: #fff; }
+        .key-chip.selected { background: var(--main); color: #fff; -webkit-text-fill-color: #fff; }
 
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .btn {
@@ -100,7 +104,6 @@
             cursor: pointer;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -132,7 +135,7 @@
     <p class="subtitle">Extract specific keys from your JSON data.</p>
 
     <div class="label-group"><span>Paste JSON Here</span></div>
-    <textarea id="input" placeholder='Paste your JSON here...' oninput="autoAnalyze()"></textarea>
+    <textarea id="input" placeholder='{"id": 1, "status": "ok"}' oninput="autoAnalyze()"></textarea>
 
     <div id="pickerArea">
         <div class="label-group"><span>Pick Keys</span></div>
