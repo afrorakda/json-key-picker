@@ -13,29 +13,26 @@
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--main);
-            line-height: 1.6;
             margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
         }
         .container {
             width: 100%;
             max-width: 420px;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
         }
-        h1 { font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-        label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; opacity: 0.6; }
+        h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.5px; }
+        .group { margin-bottom: 20px; }
+        label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 5px; }
         
         textarea {
             width: 100%;
-            height: 150px;
+            height: 120px;
             padding: 15px;
             border: 2px solid var(--main);
             border-radius: var(--radius);
@@ -44,6 +41,7 @@
             font-size: 14px;
             resize: none;
             outline: none;
+            display: block;
         }
 
         .btn {
@@ -55,35 +53,31 @@
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: opacity 0.2s;
             width: 100%;
+            margin-top: 10px;
         }
-        .btn:active { opacity: 0.8; }
 
         #keyContainer {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            min-height: 40px;
+            gap: 8px;
+            margin-top: 10px;
         }
         .key-chip {
-            padding: 8px 15px;
+            padding: 8px 12px;
             background: var(--accent);
-            border: 1px solid #ddd;
+            border: 1px solid #eee;
             border-radius: var(--radius);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            cursor: pointer;
-            user-select: none;
         }
         .key-chip.selected {
             background: var(--main);
             color: #fff;
-            border-color: var(--main);
         }
 
         footer {
-            margin-top: 40px;
+            margin-top: 50px;
             text-align: center;
             font-size: 11px;
             color: #bbb;
@@ -105,26 +99,23 @@
 <body>
 
 <div class="container">
-    <header>
-        <h1>JSON Key Picker</h1>
-    </header>
+    <h1>JSON Key Picker</h1>
 
-    <div>
+    <div class="group">
         <label>Input JSON</label>
-        <textarea id="inputJson" placeholder='Paste your JSON here...'></textarea>
+        <textarea id="inputJson" placeholder='Paste JSON here...'></textarea>
+        <button class="btn" onclick="analyze()">Extract Keys</button>
     </div>
 
-    <button class="btn" onclick="analyzeJson()">Analyze Keys</button>
-
-    <div id="keySelectorSection" style="display:none;">
-        <label>Select Keys to Keep</label>
+    <div class="group" id="selectorWrapper" style="display:none;">
+        <label>Select Keys</label>
         <div id="keyContainer"></div>
     </div>
 
-    <div>
+    <div class="group">
         <label>Result</label>
-        <textarea id="outputJson" readonly placeholder="Result will appear here..."></textarea>
-        <button class="btn" style="margin-top:10px;" onclick="copyResult()">Copy Result</button>
+        <textarea id="outputJson" readonly></textarea>
+        <button class="btn" onclick="copyText()">Copy Result</button>
     </div>
 
     <footer>
@@ -134,69 +125,51 @@
 </div>
 
 <script>
-    let currentData = null;
-    let selectedKeys = new Set();
+    let data = null;
+    let selected = new Set();
 
-    function analyzeJson() {
-        const input = document.getElementById('inputJson').value.trim();
-        const container = document.getElementById('keyContainer');
-        const section = document.getElementById('keySelectorSection');
-        
+    function analyze() {
+        const val = document.getElementById('inputJson').value;
         try {
-            currentData = JSON.parse(input);
-            if (typeof currentData !== 'object' || currentData === null) {
-                throw new Error('Not an object');
-            }
-            
-            const keys = Object.keys(currentData);
+            data = JSON.parse(val);
+            const container = document.getElementById('keyContainer');
             container.innerHTML = '';
-            selectedKeys.clear();
+            selected.clear();
             
-            keys.forEach(key => {
-                const chip = document.createElement('div');
-                chip.className = 'key-chip';
-                chip.textContent = key;
-                chip.onclick = () => toggleKey(key, chip);
-                container.appendChild(chip);
+            // 配列かオブジェクトか判断
+            const sample = Array.isArray(data) ? data[0] : data;
+            Object.keys(sample).forEach(k => {
+                const span = document.createElement('span');
+                span.className = 'key-chip';
+                span.textContent = k;
+                span.onclick = () => {
+                    span.classList.toggle('selected');
+                    selected.has(k) ? selected.delete(k) : selected.add(k);
+                    render();
+                };
+                container.appendChild(span);
             });
-            
-            section.style.display = 'block';
-            updateResult();
-        } catch (e) {
-            alert('Invalid JSON: Please check your format.');
-            section.style.display = 'none';
-        }
+            document.getElementById('selectorWrapper').style.display = 'block';
+            render();
+        } catch(e) { alert('Invalid JSON'); }
     }
 
-    function toggleKey(key, element) {
-        if (selectedKeys.has(key)) {
-            selectedKeys.delete(key);
-            element.classList.remove('selected');
-        } else {
-            selectedKeys.add(key);
-            element.classList.add('selected');
-        }
-        updateResult();
+    function render() {
+        if(!data) return;
+        const process = (obj) => {
+            let res = {};
+            selected.forEach(k => { if(k in obj) res[k] = obj[k]; });
+            return res;
+        };
+        const result = Array.isArray(data) ? data.map(process) : process(data);
+        document.getElementById('outputJson').value = selected.size ? JSON.stringify(result, null, 2) : '';
     }
 
-    function updateResult() {
-        if (!currentData) return;
-        
-        const result = {};
-        selectedKeys.forEach(key => {
-            result[key] = currentData[key];
-        });
-        
-        document.getElementById('outputJson').value = 
-            selectedKeys.size > 0 ? JSON.stringify(result, null, 2) : '';
-    }
-
-    function copyResult() {
-        const output = document.getElementById('outputJson');
-        if (!output.value) return;
-        output.select();
+    function copyText() {
+        const out = document.getElementById('outputJson');
+        out.select();
         document.execCommand('copy');
-        alert('Copied to clipboard!');
+        alert('Copied!');
     }
 </script>
 
