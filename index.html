@@ -9,188 +9,169 @@
         :root {
             --bg: #fff;
             --main: #333;
-            --accent: #fafafa;
+            --accent: #eee;
+            --input-bg: #fafafa;
             --radius: 15px;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, sans-serif;
-            background-color: var(--bg);
+            background: var(--bg);
             color: var(--main);
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
         }
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 10px 15px; /* 上下左右を詰め */
-            display: flex;
-            flex-direction: column;
+            padding: 40px 20px;
+            text-align: center;
         }
-        h1 { font-size: 1.3rem; font-weight: 800; margin: 0 0 10px 0; letter-spacing: -0.5px; }
-        .group { margin-bottom: 8px; } /* 各セクションの余白を詰め */
-        label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 2px; }
+        h1 { font-size: 2.2rem; font-weight: 900; margin: 0; letter-spacing: -1px; }
+        .subtitle { font-size: 0.9rem; color: #bbb; margin-bottom: 30px; font-weight: 500; }
         
+        .section-label { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
+
         textarea {
             width: 100%;
-            height: 65px; /* 大幅に縮小 */
-            padding: 10px;
-            border: 2px solid var(--main);
+            height: 180px;
+            padding: 20px;
+            border: none;
             border-radius: var(--radius);
-            background: var(--accent);
+            background: var(--input-bg);
             font-family: monospace;
-            font-size: 12px;
+            font-size: 14px;
             resize: none;
             outline: none;
-            display: block;
+            margin-bottom: 20px;
         }
 
-        .btn {
-            background: var(--main);
-            color: #fff;
-            border: none;
-            padding: 12px; /* 少し詰め */
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 4px;
-        }
-
-        #keyContainer {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 4px;
-        }
+        .key-area { display: none; text-align: left; margin-bottom: 20px; }
+        #keyContainer { display: flex; flex-wrap: wrap; gap: 8px; }
         .key-chip {
-            padding: 5px 10px;
-            background: var(--accent);
-            border: 1px solid #eee;
+            padding: 10px 15px;
+            background: var(--input-bg);
             border-radius: var(--radius);
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
+            transition: 0.2s;
         }
-        .key-chip.selected {
+        .key-chip.selected { background: var(--main); color: #fff; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn {
+            padding: 20px;
+            border-radius: var(--radius);
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-main { background: var(--main); color: #fff; }
+        .btn-sub { background: var(--accent); color: var(--main); }
+
+        footer { margin-top: 50px; }
+        .kofi-btn {
+            display: inline-flex;
+            align-items: center;
             background: var(--main);
             color: #fff;
-        }
-
-        footer {
-            margin-top: 20px; /* 詰め */
-            text-align: center;
-            font-size: 10px;
-            color: #bbb;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-        .hub-link, .kofi-link {
-            display: block; /* 縦に並べる */
+            padding: 10px 20px;
+            border-radius: 20px;
             text-decoration: none;
-            padding: 10px;
-            border-radius: var(--radius);
+            font-size: 0.8rem;
             font-weight: 700;
-            font-size: 0.85rem;
-            margin-bottom: 6px; /* 詰め */
+            margin-bottom: 15px;
         }
-        .hub-link {
+        .add-home {
+            display: block;
             background: var(--accent);
             color: var(--main);
-            border: 2px solid var(--main);
-            margin-bottom: 8px; /* footer textとの間 */
+            padding: 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            width: fit-content;
+            margin: 0 auto 20px;
         }
-        .kofi-link {
-            background: var(--main);
-            color: #fff;
-        }
+        .legal { font-size: 10px; color: #ccc; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>JSON Key Picker</h1>
+    <p class="subtitle">Extract specific keys from your JSON data.</p>
 
-    <div class="group">
-        <label>Input JSON</label>
-        <textarea id="inputJson" placeholder='Paste JSON here...'></textarea>
-        <button class="btn" onclick="analyze()">Extract Keys</button>
-    </div>
+    <div class="section-label"><span>Paste JSON Here</span></div>
+    <textarea id="input" placeholder='{"id":1, "name":"item"}' oninput="autoAnalyze()"></textarea>
 
-    <div class="group" id="selectorWrapper" style="display:none;">
-        <label>Select Keys</label>
+    <div class="key-area" id="keyWrapper">
+        <div class="section-label"><span>Pick Keys</span></div>
         <div id="keyContainer"></div>
     </div>
 
-    <div class="group">
-        <label>Result</label>
-        <textarea id="outputJson" readonly></textarea>
-        <button class="btn" onclick="copyText()">Copy Result</button>
+    <div class="btn-group">
+        <button class="btn btn-sub" onclick="location.reload()">Clear</button>
+        <button class="btn btn-main" onclick="copyResult()">Copy Result</button>
     </div>
 
     <footer>
-        <a href="https://afrorakda.github.io/Fridge-Combo/" class="hub-link">🏠 afrorakda Hub</a>
-        <a href="https://ko-fi.com/afrorakda" class="kofi-link">☕ Support me on Ko-fi</a>
-        <p>No login / No tracking / No ads / Browser only Privacy Policy<br>afrorakda © 2026</p>
+        <a href="https://ko-fi.com/afrorakda" class="kofi-btn">☕ Support me on Ko-fi</a>
+        <a href="#" class="add-home">Add to Home Screen</a>
+        <p class="legal">No login / No tracking / No ads / Browser only<br>afrorakda © 2026</p>
     </footer>
 </div>
 
 <script>
-    let data = null;
-    let selected = new Set();
+    let rawData = null;
+    let selectedKeys = new Set();
 
-    function analyze() {
-        const val = document.getElementById('inputJson').value.trim();
+    function autoAnalyze() {
+        const val = document.getElementById('input').value.trim();
         if(!val) return;
         try {
-            data = JSON.parse(val);
+            rawData = JSON.parse(val);
+            const sample = Array.isArray(rawData) ? rawData[0] : rawData;
             const container = document.getElementById('keyContainer');
             container.innerHTML = '';
-            selected.clear();
-            
-            // 配列かオブジェクトか判断
-            const sample = Array.isArray(data) ? data[0] : data;
-            if (typeof sample !== 'object' || sample === null) throw new Error();
+            selectedKeys.clear();
 
-            Object.keys(sample).forEach(k => {
-                const span = document.createElement('span');
-                span.className = 'key-chip';
-                span.textContent = k;
-                span.onclick = () => {
-                    span.classList.toggle('selected');
-                    selected.has(k) ? selected.delete(k) : selected.add(k);
-                    render();
+            Object.keys(sample).forEach(key => {
+                const chip = document.createElement('div');
+                chip.className = 'key-chip';
+                chip.textContent = key;
+                chip.onclick = () => {
+                    chip.classList.toggle('selected');
+                    selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key);
                 };
-                container.appendChild(span);
+                container.appendChild(chip);
             });
-            document.getElementById('selectorWrapper').style.display = 'block';
-            render();
-        } catch(e) { alert('Invalid JSON format'); }
+            document.getElementById('keyWrapper').style.display = 'block';
+        } catch(e) {}
     }
 
-    function render() {
-        if(!data) return;
+    function copyResult() {
+        if(!rawData || selectedKeys.size === 0) return;
         const process = (obj) => {
             let res = {};
-            selected.forEach(k => { if(k in obj) res[k] = obj[k]; });
+            selectedKeys.forEach(k => { if(k in obj) res[k] = obj[k]; });
             return res;
         };
-        const result = Array.isArray(data) ? data.map(process) : process(data);
-        document.getElementById('outputJson').value = selected.size ? JSON.stringify(result, null, 2) : '';
-    }
-
-    function copyText() {
-        const out = document.getElementById('outputJson');
-        if(!out.value) return;
-        out.select();
+        const result = Array.isArray(rawData) ? rawData.map(process) : process(rawData);
+        
+        const dummy = document.createElement('textarea');
+        document.body.appendChild(dummy);
+        dummy.value = JSON.stringify(result, null, 2);
+        dummy.select();
         document.execCommand('copy');
-        alert('Copied!');
+        document.body.removeChild(dummy);
+        alert('Copied picked JSON!');
     }
 </script>
-
 </body>
 </html>
