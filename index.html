@@ -8,10 +8,10 @@
     <style>
         :root {
             --bg: #fff;
-            --main: #333;
+            --main: #111;
             --accent: #eee;
-            --input-bg: #fafafa;
             --radius: 15px;
+            --input-bg: #fafafa;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
@@ -28,14 +28,14 @@
             padding: 40px 20px;
             text-align: center;
         }
-        h1 { font-size: 2.2rem; font-weight: 900; margin: 0; letter-spacing: -1px; }
+        h1 { font-size: 2.2rem; font-weight: 900; margin: 0; letter-spacing: -1.5px; }
         .subtitle { font-size: 0.9rem; color: #bbb; margin-bottom: 30px; font-weight: 500; }
         
-        .section-label { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
+        .label-group { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
 
         textarea {
             width: 100%;
-            height: 180px;
+            height: 160px;
             padding: 20px;
             border: none;
             border-radius: var(--radius);
@@ -44,11 +44,12 @@
             font-size: 14px;
             resize: none;
             outline: none;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .key-area { display: none; text-align: left; margin-bottom: 20px; }
-        #keyContainer { display: flex; flex-wrap: wrap; gap: 8px; }
+        /* Key Picker Area */
+        .picker-section { display: none; margin-bottom: 25px; text-align: left; }
+        #keyContainer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .key-chip {
             padding: 10px 15px;
             background: var(--input-bg);
@@ -56,7 +57,6 @@
             font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
         }
         .key-chip.selected { background: var(--main); color: #fff; }
 
@@ -68,7 +68,6 @@
             font-size: 0.9rem;
             font-weight: 800;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
         .btn-main { background: var(--main); color: #fff; }
         .btn-sub { background: var(--accent); color: var(--main); }
@@ -76,7 +75,6 @@
         footer { margin-top: 50px; }
         .kofi-btn {
             display: inline-flex;
-            align-items: center;
             background: var(--main);
             color: #fff;
             padding: 10px 20px;
@@ -84,36 +82,68 @@
             text-decoration: none;
             font-size: 0.8rem;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
-        .add-home {
-            display: block;
+        .add-home-btn {
+            display: inline-block;
             background: var(--accent);
             color: var(--main);
-            padding: 12px;
+            padding: 12px 24px;
             border-radius: 12px;
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 700;
-            width: fit-content;
-            margin: 0 auto 20px;
+            margin-bottom: 25px;
+            cursor: pointer;
         }
-        .legal { font-size: 10px; color: #ccc; line-height: 1.5; }
+
+        /* Modal Structure */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 25px;
+            width: 85%;
+            max-width: 320px;
+            text-align: left;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            font-size: 1.5rem;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .modal-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .modal-text { font-size: 0.9rem; color: #666; margin-bottom: 20px; line-height: 1.4; }
+
+        .legal { font-size: 10px; color: #ccc; line-height: 1.6; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>JSON Key Picker</h1>
-    <p class="subtitle">Extract specific keys from your JSON data.</p>
+    <p class="subtitle">Select specific keys from your JSON.</p>
 
-    <div class="section-label"><span>Paste JSON Here</span></div>
-    <textarea id="input" placeholder='{"id":1, "name":"item"}' oninput="autoAnalyze()"></textarea>
+    <div class="label-group"><span>Paste JSON Here</span></div>
+    <textarea id="inputArea" placeholder='{"id":1, "status":"ok"}' oninput="analyze()"></textarea>
 
-    <div class="key-area" id="keyWrapper">
-        <div class="section-label"><span>Pick Keys</span></div>
+    <div id="pickerArea" class="picker-section">
+        <div class="label-group"><span>Pick Keys</span></div>
         <div id="keyContainer"></div>
     </div>
+
+    <div class="label-group"><span>Result</span></div>
+    <textarea id="outputArea" readonly placeholder="Result will appear here..."></textarea>
 
     <div class="btn-group">
         <button class="btn btn-sub" onclick="location.reload()">Clear</button>
@@ -121,18 +151,30 @@
     </div>
 
     <footer>
-        <a href="https://ko-fi.com/afrorakda" class="kofi-btn">☕ Support me on Ko-fi</a>
-        <a href="#" class="add-home">Add to Home Screen</a>
-        <p class="legal">No login / No tracking / No ads / Browser only<br>afrorakda © 2026</p>
+        <a href="https://ko-fi.com/afrorakda" class="kofi-btn">☕ Support me on Ko-fi</a><br>
+        <div class="add-home-btn" onclick="toggleModal(true)">Add to Home Screen</div>
+        <p class="legal">No login / No tracking / No ads / Browser only<br>Privacy Policy / afrorakda © 2026</p>
     </footer>
+</div>
+
+<div id="homeModal" class="modal" onclick="toggleModal(false)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="toggleModal(false)">×</span>
+        <div class="modal-title">📱 Install</div>
+        <p class="modal-text">Add to home screen.</p>
+        <p class="modal-text">
+            <strong>🍏 iPhone:</strong> Share > Add to Home Screen<br><br>
+            <strong>🤖 Android:</strong> Menu > Add to home screen
+        </p>
+    </div>
 </div>
 
 <script>
     let rawData = null;
     let selectedKeys = new Set();
 
-    function autoAnalyze() {
-        const val = document.getElementById('input').value.trim();
+    function analyze() {
+        const val = document.getElementById('inputArea').value.trim();
         if(!val) return;
         try {
             rawData = JSON.parse(val);
@@ -148,30 +190,37 @@
                 chip.onclick = () => {
                     chip.classList.toggle('selected');
                     selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key);
+                    updateOutput();
                 };
                 container.appendChild(chip);
             });
-            document.getElementById('keyWrapper').style.display = 'block';
+            document.getElementById('pickerArea').style.display = 'block';
         } catch(e) {}
     }
 
-    function copyResult() {
-        if(!rawData || selectedKeys.size === 0) return;
+    function updateOutput() {
+        if(!rawData) return;
         const process = (obj) => {
             let res = {};
             selectedKeys.forEach(k => { if(k in obj) res[k] = obj[k]; });
             return res;
         };
         const result = Array.isArray(rawData) ? rawData.map(process) : process(rawData);
-        
-        const dummy = document.createElement('textarea');
-        document.body.appendChild(dummy);
-        dummy.value = JSON.stringify(result, null, 2);
-        dummy.select();
+        document.getElementById('outputArea').value = selectedKeys.size ? JSON.stringify(result, null, 2) : '';
+    }
+
+    function copyResult() {
+        const out = document.getElementById('outputArea');
+        if(!out.value) return;
+        out.select();
         document.execCommand('copy');
-        document.body.removeChild(dummy);
-        alert('Copied picked JSON!');
+        alert('Copied!');
+    }
+
+    function toggleModal(show) {
+        document.getElementById('homeModal').style.display = show ? 'flex' : 'none';
     }
 </script>
+
 </body>
 </html>
