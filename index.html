@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JSON Key Picker - Fridge Combo</title>
+    <link rel="apple-touch-icon" href="image_29.png">
     <style>
         :root {
             --bg: #fff;
@@ -20,25 +21,28 @@
             padding: 0;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 20px;
+            padding: 10px 15px; /* 上下左右を詰め */
+            display: flex;
+            flex-direction: column;
         }
-        h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.5px; }
-        .group { margin-bottom: 20px; }
-        label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 5px; }
+        h1 { font-size: 1.3rem; font-weight: 800; margin: 0 0 10px 0; letter-spacing: -0.5px; }
+        .group { margin-bottom: 8px; } /* 各セクションの余白を詰め */
+        label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 2px; }
         
         textarea {
             width: 100%;
-            height: 120px;
-            padding: 15px;
+            height: 65px; /* 大幅に縮小 */
+            padding: 10px;
             border: 2px solid var(--main);
             border-radius: var(--radius);
             background: var(--accent);
             font-family: monospace;
-            font-size: 14px;
+            font-size: 12px;
             resize: none;
             outline: none;
             display: block;
@@ -48,28 +52,29 @@
             background: var(--main);
             color: #fff;
             border: none;
-            padding: 15px;
+            padding: 12px; /* 少し詰め */
             border-radius: var(--radius);
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 4px;
         }
 
         #keyContainer {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 5px;
+            margin-top: 4px;
         }
         .key-chip {
-            padding: 8px 12px;
+            padding: 5px 10px;
             background: var(--accent);
             border: 1px solid #eee;
             border-radius: var(--radius);
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
         }
         .key-chip.selected {
             background: var(--main);
@@ -77,22 +82,31 @@
         }
 
         footer {
-            margin-top: 50px;
+            margin-top: 20px; /* 詰め */
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             color: #bbb;
             border-top: 1px solid #eee;
-            padding-top: 20px;
+            padding-top: 15px;
         }
-        .kofi-link {
-            display: inline-block;
-            background: var(--main);
-            color: #fff;
+        .hub-link, .kofi-link {
+            display: block; /* 縦に並べる */
             text-decoration: none;
-            padding: 10px 20px;
+            padding: 10px;
             border-radius: var(--radius);
             font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 6px; /* 詰め */
+        }
+        .hub-link {
+            background: var(--accent);
+            color: var(--main);
+            border: 2px solid var(--main);
+            margin-bottom: 8px; /* footer textとの間 */
+        }
+        .kofi-link {
+            background: var(--main);
+            color: #fff;
         }
     </style>
 </head>
@@ -119,6 +133,7 @@
     </div>
 
     <footer>
+        <a href="https://afrorakda.github.io/Fridge-Combo/" class="hub-link">🏠 afrorakda Hub</a>
         <a href="https://ko-fi.com/afrorakda" class="kofi-link">☕ Support me on Ko-fi</a>
         <p>No login / No tracking / No ads / Browser only Privacy Policy<br>afrorakda © 2026</p>
     </footer>
@@ -129,7 +144,8 @@
     let selected = new Set();
 
     function analyze() {
-        const val = document.getElementById('inputJson').value;
+        const val = document.getElementById('inputJson').value.trim();
+        if(!val) return;
         try {
             data = JSON.parse(val);
             const container = document.getElementById('keyContainer');
@@ -138,6 +154,8 @@
             
             // 配列かオブジェクトか判断
             const sample = Array.isArray(data) ? data[0] : data;
+            if (typeof sample !== 'object' || sample === null) throw new Error();
+
             Object.keys(sample).forEach(k => {
                 const span = document.createElement('span');
                 span.className = 'key-chip';
@@ -151,7 +169,7 @@
             });
             document.getElementById('selectorWrapper').style.display = 'block';
             render();
-        } catch(e) { alert('Invalid JSON'); }
+        } catch(e) { alert('Invalid JSON format'); }
     }
 
     function render() {
@@ -167,6 +185,7 @@
 
     function copyText() {
         const out = document.getElementById('outputJson');
+        if(!out.value) return;
         out.select();
         document.execCommand('copy');
         alert('Copied!');
