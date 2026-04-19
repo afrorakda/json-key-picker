@@ -35,8 +35,13 @@
         }
         .subtitle { font-size: 0.85rem; color: #999; font-weight: 700; margin-bottom: 25px; }
         
-        .label-group { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
-        .count-badge { background: var(--main); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.6rem; display: none; }
+        .label-group { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
+        .count-badge { background: var(--main); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.6rem; }
+
+        /* View Toggle */
+        .view-toggle { display: flex; background: var(--accent); padding: 3px; border-radius: 10px; }
+        .toggle-btn { border: none; background: transparent; padding: 4px 10px; font-size: 0.6rem; font-weight: 800; border-radius: 7px; cursor: pointer; color: #999; }
+        .toggle-btn.active { background: #fff; color: var(--main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
         .input-wrapper { position: relative; margin-bottom: 20px; }
         textarea {
@@ -63,46 +68,28 @@
         }
         .key-chip.selected { background: var(--main); border-color: var(--main); color: #fff; }
 
+        /* Result Area */
+        .result-wrapper { position: relative; width: 100%; min-height: 200px; border-radius: var(--radius); border: 2px solid var(--accent); background: var(--input-bg); overflow: hidden; margin-bottom: 25px; }
+        #outputCode { width: 100%; height: 200px; border: none; padding: 15px; background: transparent; font-family: ui-monospace, monospace; font-size: 12px; font-weight: 600; resize: none; outline: none; display: block; -webkit-text-fill-color: var(--main); }
+        
+        #outputTable { width: 100%; height: 200px; overflow: auto; display: none; padding: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.75rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--accent); background: #fff; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--accent); border-right: 1px solid var(--accent); white-space: nowrap; }
+        th { background: var(--accent); font-weight: 800; color: #777; font-size: 0.65rem; text-transform: uppercase; }
+
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
-        .btn {
-            padding: 18px; border-radius: var(--radius); border: none;
-            font-size: 0.9rem; font-weight: 900; cursor: pointer; -webkit-appearance: none;
-        }
+        .btn { padding: 18px; border-radius: var(--radius); border: none; font-size: 0.9rem; font-weight: 900; cursor: pointer; -webkit-appearance: none; }
         .btn-main { background: var(--main); color: #fff; -webkit-text-fill-color: #fff; }
         .btn-sub { background: var(--accent); color: var(--main); -webkit-text-fill-color: var(--main); }
 
         footer { margin-top: 30px; text-align: center; }
         .footer-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .kofi-btn {
-            width: 100%; background: var(--main); color: #fff; padding: 16px;
-            border-radius: var(--radius); text-decoration: none; font-weight: 900; font-size: 0.9rem;
-            -webkit-text-fill-color: #fff;
-        }
-        .home-btn {
-            width: 100%; background: var(--accent); color: var(--main); padding: 14px;
-            border-radius: var(--radius); font-weight: 800; font-size: 0.85rem;
-            cursor: pointer; border: none; -webkit-appearance: none;
-        }
-
+        .kofi-btn { width: 100%; background: var(--main); color: #fff; padding: 16px; border-radius: var(--radius); text-decoration: none; font-weight: 900; font-size: 0.9rem; -webkit-text-fill-color: #fff; }
+        .home-btn { width: 100%; background: var(--accent); color: var(--main); padding: 14px; border-radius: var(--radius); font-weight: 800; font-size: 0.85rem; cursor: pointer; border: none; -webkit-appearance: none; }
         .legal { font-size: 0.7rem; color: #bbb; line-height: 1.6; font-weight: 600; }
         .legal a { color: inherit; text-decoration: underline; }
 
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center;
-            z-index: 1000; backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background: #fff; padding: 35px; border-radius: var(--radius);
-            width: 85%; max-width: 340px; text-align: left; position: relative;
-        }
-        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #ccc; cursor: pointer; }
-
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--main); color: #fff; padding: 10px 20px;
-            border-radius: 20px; font-size: 0.8rem; font-weight: 800; display: none; z-index: 2000;
-        }
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--main); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; display: none; z-index: 2000; }
     </style>
 </head>
 <body>
@@ -112,11 +99,11 @@
         <h1>JSON Key Picker</h1>
         <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
     </header>
-    <p class="subtitle">Deep extract specific keys from JSON.</p>
+    <p class="subtitle">Extract specific keys from JSON.</p>
 
     <div class="label-group">
         <span>Paste JSON</span>
-        <span id="itemCount" class="count-badge"></span>
+        <span id="itemCount" class="count-badge" style="display:none"></span>
     </div>
     <div class="input-wrapper">
         <textarea id="input" oninput="analyze()" placeholder='Paste JSON data here...'></textarea>
@@ -124,12 +111,21 @@
     </div>
 
     <div id="pickerArea">
-        <div class="label-group"><span>Pick Keys to Extract</span></div>
+        <div class="label-group"><span>Select Keys</span></div>
         <div id="keyContainer"></div>
     </div>
 
-    <div class="label-group"><span>Result Preview</span></div>
-    <textarea id="output" readonly placeholder="Selected data will appear here..."></textarea>
+    <div class="label-group">
+        <span>Result</span>
+        <div class="view-toggle">
+            <button class="toggle-btn active" id="btnJson" onclick="setView('json')">JSON</button>
+            <button class="toggle-btn" id="btnTable" onclick="setView('table')">TABLE</button>
+        </div>
+    </div>
+    <div class="result-wrapper">
+        <textarea id="outputCode" readonly placeholder="Selected data will appear here..."></textarea>
+        <div id="outputTable"></div>
+    </div>
 
     <div class="btn-group">
         <button class="btn btn-sub" onclick="clearAll()">Clear</button>
@@ -139,7 +135,7 @@
     <footer>
         <div class="footer-btns">
             <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
-            <button class="home-btn" onclick="toggleModal(true)">Add to Home Screen</button>
+            <button class="home-btn" onclick="document.getElementById('toast').style.display='block';setTimeout(()=>document.getElementById('toast').style.display='none',2000)">Add to Home Screen</button>
         </div>
         <p class="legal">
             No login / No tracking / No ads / Browser only<br>
@@ -148,20 +144,10 @@
     </footer>
 </div>
 
-<div id="toast">Copied!</div>
-
-<div id="homeModal" class="modal" onclick="toggleModal(false)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <span class="modal-close" onclick="toggleModal(false)">×</span>
-        <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:15px;">📱 Install</h2>
-        <p style="font-size:0.85rem; margin-top:15px;"><strong>🍏 iPhone:</strong> Share > Add to Home Screen</p>
-        <p style="font-size:0.85rem; margin-top:10px;"><strong>🤖 Android:</strong> Menu > Add to Home Screen</p>
-    </div>
-</div>
+<div id="toast">Function ready!</div>
 
 <script>
-    let rawData = null;
-    let selectedKeys = new Set();
+    let rawData = null, selectedKeys = new Set(), currentView = 'json';
 
     function getAllKeys(obj, prefix = '') {
         let keys = [];
@@ -175,117 +161,94 @@
         return keys;
     }
 
-    function getValue(obj, path) {
-        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-    }
-
+    function getValue(obj, path) { return path.split('.').reduce((acc, part) => acc && acc[part], obj); }
     function setValue(obj, path, value) {
-        const parts = path.split('.');
-        const last = parts.pop();
-        const target = parts.reduce((acc, part) => {
-            if (!acc[part]) acc[part] = {};
-            return acc[part];
-        }, obj);
+        const parts = path.split('.'), last = parts.pop();
+        const target = parts.reduce((acc, part) => { if (!acc[part]) acc[part] = {}; return acc[part]; }, obj);
         target[last] = value;
     }
 
     function analyze() {
-        const inputEl = document.getElementById('input');
-        const val = inputEl.value.trim();
-        const picker = document.getElementById('pickerArea');
-        const clrBtn = document.getElementById('clr-input');
-        const countBadge = document.getElementById('itemCount');
-        
+        const val = document.getElementById('input').value.trim();
+        const picker = document.getElementById('pickerArea'), clrBtn = document.getElementById('clr-input'), countBadge = document.getElementById('itemCount');
         clrBtn.style.display = val ? 'flex' : 'none';
-
-        if(!val) { 
-            picker.style.display = 'none'; 
-            countBadge.style.display = 'none';
-            document.getElementById('output').value = '';
-            return; 
-        }
-
+        if(!val) { picker.style.display = 'none'; countBadge.style.display = 'none'; update(); return; }
         try {
             rawData = JSON.parse(val);
             const isArr = Array.isArray(rawData);
             countBadge.textContent = isArr ? `${rawData.length} items` : '1 object';
             countBadge.style.display = 'block';
-
             const sample = isArr ? rawData[0] : rawData;
             const keys = [...new Set(getAllKeys(sample))];
             const container = document.getElementById('keyContainer');
-            
-            const currentKeysStr = keys.join(',');
-            if (container.dataset.lastKeys !== currentKeysStr) {
-                container.innerHTML = '';
-                selectedKeys.clear();
+            if (container.dataset.lastKeys !== keys.join(',')) {
+                container.innerHTML = ''; selectedKeys.clear();
                 keys.forEach(key => {
-                    const chip = document.createElement('div');
-                    chip.className = 'key-chip';
-                    chip.textContent = key;
-                    chip.onclick = () => {
-                        chip.classList.toggle('selected');
-                        selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key);
-                        update();
-                    };
+                    const chip = document.createElement('div'); chip.className = 'key-chip'; chip.textContent = key;
+                    chip.onclick = () => { chip.classList.toggle('selected'); selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key); update(); };
                     container.appendChild(chip);
                 });
-                container.dataset.lastKeys = currentKeysStr;
+                container.dataset.lastKeys = keys.join(',');
             }
             picker.style.display = 'block';
-        } catch(e) { 
-            picker.style.display = 'none';
-            countBadge.style.display = 'none';
-        }
+        } catch(e) { picker.style.display = 'none'; countBadge.style.display = 'none'; }
     }
 
     function update() {
-        if(!rawData) return;
+        if(!rawData) { document.getElementById('outputCode').value = ''; document.getElementById('outputTable').innerHTML = ''; return; }
         const process = (obj) => {
             let res = {};
-            selectedKeys.forEach(path => {
-                const val = getValue(obj, path);
-                if (val !== undefined) setValue(res, path, val);
-            });
+            selectedKeys.forEach(path => { const v = getValue(obj, path); if (v !== undefined) setValue(res, path, v); });
             return res;
         };
         const result = Array.isArray(rawData) ? rawData.map(process) : process(rawData);
-        document.getElementById('output').value = selectedKeys.size ? JSON.stringify(result, null, 2) : '';
+        const finalData = selectedKeys.size ? result : [];
+        document.getElementById('outputCode').value = selectedKeys.size ? JSON.stringify(finalData, null, 2) : '';
+        renderTable(finalData);
+    }
+
+    function renderTable(data) {
+        const tableArea = document.getElementById('outputTable');
+        if (!selectedKeys.size || !data || (Array.isArray(data) && data.length === 0)) { tableArea.innerHTML = ''; return; }
+        const list = Array.isArray(data) ? data : [data];
+        let html = '<table><thead><tr>';
+        selectedKeys.forEach(k => html += `<th>${k}</th>`);
+        html += '</tr></thead><tbody>';
+        list.forEach(row => {
+            html += '<tr>';
+            selectedKeys.forEach(k => {
+                const val = getValue(row, k);
+                html += `<td>${val !== undefined ? (typeof val === 'object' ? '...' : val) : ''}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        tableArea.innerHTML = html;
+    }
+
+    function setView(v) {
+        currentView = v;
+        document.getElementById('btnJson').classList.toggle('active', v === 'json');
+        document.getElementById('btnTable').classList.toggle('active', v === 'table');
+        document.getElementById('outputCode').style.display = v === 'json' ? 'block' : 'none';
+        document.getElementById('outputTable').style.display = v === 'table' ? 'block' : 'none';
     }
 
     function clearAll() {
         document.getElementById('input').value = '';
-        document.getElementById('output').value = '';
         document.getElementById('keyContainer').innerHTML = '';
         document.getElementById('keyContainer').dataset.lastKeys = '';
         document.getElementById('itemCount').style.display = 'none';
-        selectedKeys.clear();
-        analyze();
+        selectedKeys.clear(); update(); analyze();
     }
 
     function copyResult() {
-        const out = document.getElementById('output');
-        if(!out.value) return;
+        const out = document.getElementById('outputCode'); if(!out.value) return;
         navigator.clipboard.writeText(out.value).then(() => {
-            const toast = document.getElementById('toast');
-            toast.style.display = 'block';
-            setTimeout(() => toast.style.display = 'none', 2000);
+            const toast = document.getElementById('toast'); toast.textContent = 'Copied!';
+            toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 2000);
         });
     }
-
-    function toggleModal(s) { document.getElementById('homeModal').style.display = s ? 'flex' : 'none'; }
-
-    async function loadFooter() {
-        try {
-            const res = await fetch('footer.json');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.kofi) document.querySelector('.kofi-btn').textContent = data.kofi.text;
-            }
-        } catch (e) {}
-    }
-    window.onload = loadFooter;
 </script>
-
 </body>
 </html>
