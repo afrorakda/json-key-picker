@@ -14,90 +14,59 @@
             --input-bg: #fafafa;
             --radius: 15px;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
+            background: var(--bg); color: var(--main);
+            display: flex; justify-content: center;
             -webkit-font-smoothing: antialiased;
         }
         .container {
-            width: 100%;
-            max-width: 420px;
+            width: 100%; max-width: 420px;
             padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px env(safe-area-inset-bottom, 20px) 20px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            display: flex; flex-direction: column; min-height: 100vh;
         }
         
-        header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            width: 100%; margin-bottom: 5px; 
-        }
-        h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -1.5px; color: var(--main); }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -1.5px; }
         .hub-link {
             text-decoration: none; font-size: 0.8rem; font-weight: 800; color: var(--main);
             background: var(--accent); padding: 8px 14px; border-radius: 12px;
         }
-        .subtitle { font-size: 0.85rem; color: #999; font-weight: 700; margin-bottom: 25px; align-self: flex-start; }
+        .subtitle { font-size: 0.85rem; color: #999; font-weight: 700; margin-bottom: 25px; }
         
         .label-group { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
+        .count-badge { background: var(--main); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.6rem; display: none; }
 
-        .input-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
+        .input-wrapper { position: relative; margin-bottom: 20px; }
         textarea {
-            width: 100%;
-            height: 140px;
-            padding: 15px;
-            border: 2px solid var(--accent);
-            border-radius: var(--radius);
-            background: var(--input-bg);
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 14px;
-            font-weight: 600;
-            resize: none;
-            outline: none;
-            color: var(--main) !important;
-            opacity: 1 !important;
-            -webkit-appearance: none;
-            -webkit-text-fill-color: var(--main);
+            width: 100%; height: 140px; padding: 15px; border: 2px solid var(--accent);
+            border-radius: var(--radius); background: var(--input-bg);
+            font-family: ui-monospace, monospace; font-size: 13px; font-weight: 600;
+            resize: none; outline: none; color: var(--main) !important;
+            opacity: 1 !important; -webkit-appearance: none; -webkit-text-fill-color: var(--main);
         }
         textarea::placeholder { color: #bbb; -webkit-text-fill-color: #bbb; }
 
         .clr-btn {
-            position: absolute; right: 10px; top: 10px;
-            width: 24px; height: 24px; border-radius: 50%;
-            background: #ccc; color: #fff; border: none;
-            font-size: 16px; cursor: pointer; display: none;
-            align-items: center; justify-content: center; line-height: 1;
+            position: absolute; right: 10px; top: 10px; width: 24px; height: 24px;
+            border-radius: 50%; background: #ccc; color: #fff; border: none;
+            font-size: 16px; cursor: pointer; display: none; align-items: center; justify-content: center;
         }
 
-        #pickerArea { display: none; margin-bottom: 25px; text-align: left; }
+        #pickerArea { display: none; margin-bottom: 25px; }
         #keyContainer { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .key-chip {
-            padding: 10px 15px;
-            background: var(--input-bg);
-            border: 2px solid var(--accent);
-            border-radius: var(--radius);
-            font-size: 0.75rem;
-            font-weight: 800;
-            cursor: pointer;
-            color: var(--main);
-            transition: 0.2s;
+            padding: 8px 14px; background: var(--input-bg); border: 2px solid var(--accent);
+            border-radius: var(--radius); font-size: 0.7rem; font-weight: 800;
+            cursor: pointer; color: var(--main); transition: 0.2s;
         }
         .key-chip.selected { background: var(--main); border-color: var(--main); color: #fff; }
 
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
         .btn {
-            padding: 18px;
-            border-radius: var(--radius);
-            border: none;
-            font-size: 0.9rem;
-            font-weight: 900;
-            cursor: pointer;
-            -webkit-appearance: none;
+            padding: 18px; border-radius: var(--radius); border: none;
+            font-size: 0.9rem; font-weight: 900; cursor: pointer; -webkit-appearance: none;
         }
         .btn-main { background: var(--main); color: #fff; -webkit-text-fill-color: #fff; }
         .btn-sub { background: var(--accent); color: var(--main); -webkit-text-fill-color: var(--main); }
@@ -118,10 +87,8 @@
         .legal { font-size: 0.7rem; color: #bbb; line-height: 1.6; font-weight: 600; }
         .legal a { color: inherit; text-decoration: underline; }
 
-        /* Modal */
         .modal {
-            display: none; position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); align-items: center; justify-content: center;
             z-index: 1000; backdrop-filter: blur(4px);
         }
@@ -130,15 +97,12 @@
             width: 85%; max-width: 340px; text-align: left; position: relative;
         }
         .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #ccc; cursor: pointer; }
-        .modal-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; }
 
         #toast {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--main); color: #fff; padding: 10px 20px;
-            border-radius: 20px; font-size: 0.8rem; font-weight: 800;
-            display: none; z-index: 2000; animation: fadeIn 0.3s;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 800; display: none; z-index: 2000;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
     </style>
 </head>
 <body>
@@ -148,21 +112,24 @@
         <h1>JSON Key Picker</h1>
         <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
     </header>
-    <p class="subtitle">Extract specific keys from JSON.</p>
+    <p class="subtitle">Deep extract specific keys from JSON.</p>
 
-    <div class="label-group"><span>Paste JSON</span></div>
+    <div class="label-group">
+        <span>Paste JSON</span>
+        <span id="itemCount" class="count-badge"></span>
+    </div>
     <div class="input-wrapper">
-        <textarea id="input" oninput="analyze()" placeholder='{"id": 1, "name": "Item", "status": "ok"}'></textarea>
+        <textarea id="input" oninput="analyze()" placeholder='Paste JSON data here...'></textarea>
         <button id="clr-input" class="clr-btn" onclick="clearAll()">×</button>
     </div>
 
     <div id="pickerArea">
-        <div class="label-group"><span>Select Keys to Keep</span></div>
+        <div class="label-group"><span>Pick Keys to Extract</span></div>
         <div id="keyContainer"></div>
     </div>
 
-    <div class="label-group"><span>Result</span></div>
-    <textarea id="output" readonly placeholder="Pick keys above..."></textarea>
+    <div class="label-group"><span>Result Preview</span></div>
+    <textarea id="output" readonly placeholder="Selected data will appear here..."></textarea>
 
     <div class="btn-group">
         <button class="btn btn-sub" onclick="clearAll()">Clear</button>
@@ -186,8 +153,7 @@
 <div id="homeModal" class="modal" onclick="toggleModal(false)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="toggleModal(false)">×</span>
-        <div class="modal-title">📱 Install</div>
-        <p style="font-size:0.9rem; font-weight:600; color:#666; line-height:1.5;">Add JSON Key Picker to your home screen.</p>
+        <h2 style="font-size:1.3rem; font-weight:900; margin-bottom:15px;">📱 Install</h2>
         <p style="font-size:0.85rem; margin-top:15px;"><strong>🍏 iPhone:</strong> Share > Add to Home Screen</p>
         <p style="font-size:0.85rem; margin-top:10px;"><strong>🤖 Android:</strong> Menu > Add to Home Screen</p>
     </div>
@@ -197,31 +163,63 @@
     let rawData = null;
     let selectedKeys = new Set();
 
+    function getAllKeys(obj, prefix = '') {
+        let keys = [];
+        for (let key in obj) {
+            const fullKey = prefix ? `${prefix}.${key}` : key;
+            keys.push(fullKey);
+            if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                keys = keys.concat(getAllKeys(obj[key], fullKey));
+            }
+        }
+        return keys;
+    }
+
+    function getValue(obj, path) {
+        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
+
+    function setValue(obj, path, value) {
+        const parts = path.split('.');
+        const last = parts.pop();
+        const target = parts.reduce((acc, part) => {
+            if (!acc[part]) acc[part] = {};
+            return acc[part];
+        }, obj);
+        target[last] = value;
+    }
+
     function analyze() {
         const inputEl = document.getElementById('input');
         const val = inputEl.value.trim();
         const picker = document.getElementById('pickerArea');
         const clrBtn = document.getElementById('clr-input');
+        const countBadge = document.getElementById('itemCount');
         
         clrBtn.style.display = val ? 'flex' : 'none';
 
         if(!val) { 
             picker.style.display = 'none'; 
+            countBadge.style.display = 'none';
             document.getElementById('output').value = '';
             return; 
         }
 
         try {
             rawData = JSON.parse(val);
-            const sample = Array.isArray(rawData) ? rawData[0] : rawData;
+            const isArr = Array.isArray(rawData);
+            countBadge.textContent = isArr ? `${rawData.length} items` : '1 object';
+            countBadge.style.display = 'block';
+
+            const sample = isArr ? rawData[0] : rawData;
+            const keys = [...new Set(getAllKeys(sample))];
             const container = document.getElementById('keyContainer');
             
-            // キーが変わった場合のみ再描画
-            const currentKeys = Object.keys(sample).join(',');
-            if (container.dataset.lastKeys !== currentKeys) {
+            const currentKeysStr = keys.join(',');
+            if (container.dataset.lastKeys !== currentKeysStr) {
                 container.innerHTML = '';
                 selectedKeys.clear();
-                Object.keys(sample).forEach(key => {
+                keys.forEach(key => {
                     const chip = document.createElement('div');
                     chip.className = 'key-chip';
                     chip.textContent = key;
@@ -232,11 +230,12 @@
                     };
                     container.appendChild(chip);
                 });
-                container.dataset.lastKeys = currentKeys;
+                container.dataset.lastKeys = currentKeysStr;
             }
             picker.style.display = 'block';
         } catch(e) { 
-            picker.style.display = 'none'; 
+            picker.style.display = 'none';
+            countBadge.style.display = 'none';
         }
     }
 
@@ -244,7 +243,10 @@
         if(!rawData) return;
         const process = (obj) => {
             let res = {};
-            selectedKeys.forEach(k => { if(k in obj) res[k] = obj[k]; });
+            selectedKeys.forEach(path => {
+                const val = getValue(obj, path);
+                if (val !== undefined) setValue(res, path, val);
+            });
             return res;
         };
         const result = Array.isArray(rawData) ? rawData.map(process) : process(rawData);
@@ -256,6 +258,7 @@
         document.getElementById('output').value = '';
         document.getElementById('keyContainer').innerHTML = '';
         document.getElementById('keyContainer').dataset.lastKeys = '';
+        document.getElementById('itemCount').style.display = 'none';
         selectedKeys.clear();
         analyze();
     }
