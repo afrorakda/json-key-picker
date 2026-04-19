@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>JSON Key Picker</title>
     <link rel="apple-touch-icon" href="image_29.png">
-    <link rel="icon" type="image/png" href="image_29.png">
+    <link rel="icon" type="image/png" href="image_28.png">
     <style>
         :root {
             --bg: #fff;
@@ -88,7 +88,6 @@
         .legal { font-size: 0.7rem; color: #bbb; line-height: 1.6; font-weight: 600; }
         .legal a { color: inherit; text-decoration: underline; }
 
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
         .modal-content { background: #fff; padding: 35px; border-radius: var(--radius); width: 85%; max-width: 340px; text-align: left; position: relative; }
         .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #ccc; cursor: pointer; }
@@ -103,7 +102,7 @@
         <h1>JSON Key Picker</h1>
         <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
     </header>
-    <p class="subtitle">Deep extract specific keys from JSON.</p>
+    <p class="subtitle">Extract specific keys from JSON.</p>
 
     <div class="label-group">
         <span>Paste JSON</span>
@@ -175,11 +174,6 @@
     }
 
     function getValue(obj, path) { return path.split('.').reduce((acc, part) => acc && acc[part], obj); }
-    function setValue(obj, path, value) {
-        const parts = path.split('.'), last = parts.pop();
-        const target = parts.reduce((acc, part) => { if (!acc[part]) acc[part] = {}; return acc[part]; }, obj);
-        target[last] = value;
-    }
 
     function analyze() {
         const val = document.getElementById('input').value.trim();
@@ -209,19 +203,28 @@
 
     function update() {
         if(!rawData) { document.getElementById('outputCode').value = ''; document.getElementById('outputTable').innerHTML = ''; return; }
+        
         const process = (obj) => {
             let res = {};
-            selectedKeys.forEach(path => { const v = getValue(obj, path); if (v !== undefined) setValue(res, path, v); });
+            selectedKeys.forEach(path => {
+                const v = getValue(obj, path);
+                if (v !== undefined) {
+                    // 修正：選んだパスをそのままキー名として使用
+                    res[path] = v; 
+                }
+            });
             return res;
         };
+
         const result = Array.isArray(rawData) ? rawData.map(process) : process(rawData);
-        document.getElementById('outputCode').value = selectedKeys.size ? JSON.stringify(result, null, 2) : '';
-        renderTable(result);
+        const finalData = selectedKeys.size ? result : [];
+        document.getElementById('outputCode').value = selectedKeys.size ? JSON.stringify(finalData, null, 2) : '';
+        renderTable(finalData);
     }
 
     function renderTable(data) {
         const tableArea = document.getElementById('outputTable');
-        if (!selectedKeys.size || !data) { tableArea.innerHTML = ''; return; }
+        if (!selectedKeys.size || !data || (Array.isArray(data) && data.length === 0)) { tableArea.innerHTML = ''; return; }
         const list = Array.isArray(data) ? data : [data];
         let html = '<table><thead><tr>';
         selectedKeys.forEach(k => html += `<th>${k}</th>`);
@@ -229,8 +232,9 @@
         list.forEach(row => {
             html += '<tr>';
             selectedKeys.forEach(k => {
-                const val = getValue(row, k);
-                html += `<td>${val !== undefined ? (typeof val === 'object' ? '...' : val) : ''}</td>`;
+                const val = row[k];
+                // オブジェクトの場合は簡略化表示
+                html += `<td>${val !== undefined ? (typeof val === 'object' ? '{...}' : val) : ''}</td>`;
             });
             html += '</tr>';
         });
@@ -253,7 +257,7 @@
         document.getElementById('keyContainer').innerHTML = '';
         document.getElementById('keyContainer').dataset.lastKeys = '';
         document.getElementById('itemCount').style.display = 'none';
-        selectedKeys.clear(); analyze();
+        selectedKeys.clear(); update(); analyze();
     }
 
     function copyResult() {
