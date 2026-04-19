@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JSON Key Picker - Fridge Combo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>JSON Key Picker</title>
     <link rel="apple-touch-icon" href="image_29.png">
+    <link rel="icon" type="image/png" href="image_29.png">
     <style>
         :root {
             --bg: #fff;
@@ -15,40 +16,62 @@
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--bg);
             color: var(--main);
             margin: 0;
             display: flex;
             justify-content: center;
+            -webkit-font-smoothing: antialiased;
         }
         .container {
             width: 100%;
             max-width: 420px;
-            padding: 40px 20px;
-            text-align: center;
+            padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px env(safe-area-inset-bottom, 20px) 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        h1 { font-size: 2.2rem; font-weight: 900; margin: 0; letter-spacing: -1.5px; }
-        .subtitle { font-size: 0.9rem; color: #bbb; margin-bottom: 30px; font-weight: 500; }
+        
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            width: 100%; margin-bottom: 5px; 
+        }
+        h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -1.5px; color: var(--main); }
+        .hub-link {
+            text-decoration: none; font-size: 0.8rem; font-weight: 800; color: var(--main);
+            background: var(--accent); padding: 8px 14px; border-radius: 12px;
+        }
+        .subtitle { font-size: 0.85rem; color: #999; font-weight: 700; margin-bottom: 25px; align-self: flex-start; }
         
         .label-group { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #bbb; margin-bottom: 8px; text-transform: uppercase; }
 
+        .input-wrapper { position: relative; width: 100%; margin-bottom: 20px; }
         textarea {
             width: 100%;
-            height: 160px;
-            padding: 20px;
-            border: none;
+            height: 140px;
+            padding: 15px;
+            border: 2px solid var(--accent);
             border-radius: var(--radius);
             background: var(--input-bg);
-            font-family: monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 14px;
+            font-weight: 600;
             resize: none;
             outline: none;
-            margin-bottom: 20px;
             color: var(--main) !important;
             opacity: 1 !important;
             -webkit-appearance: none;
             -webkit-text-fill-color: var(--main);
+        }
+        textarea::placeholder { color: #bbb; -webkit-text-fill-color: #bbb; }
+
+        .clr-btn {
+            position: absolute; right: 10px; top: 10px;
+            width: 24px; height: 24px; border-radius: 50%;
+            background: #ccc; color: #fff; border: none;
+            font-size: 16px; cursor: pointer; display: none;
+            align-items: center; justify-content: center; line-height: 1;
         }
 
         #pickerArea { display: none; margin-bottom: 25px; text-align: left; }
@@ -56,115 +79,105 @@
         .key-chip {
             padding: 10px 15px;
             background: var(--input-bg);
+            border: 2px solid var(--accent);
             border-radius: var(--radius);
-            font-size: 0.8rem;
-            font-weight: 700;
+            font-size: 0.75rem;
+            font-weight: 800;
             cursor: pointer;
             color: var(--main);
+            transition: 0.2s;
         }
-        .key-chip.selected { background: var(--main); color: #fff; }
+        .key-chip.selected { background: var(--main); border-color: var(--main); color: #fff; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
         .btn {
-            padding: 20px;
+            padding: 18px;
             border-radius: var(--radius);
             border: none;
             font-size: 0.9rem;
-            font-weight: 800;
+            font-weight: 900;
             cursor: pointer;
+            -webkit-appearance: none;
         }
-        .btn-main { background: var(--main); color: #fff; }
-        .btn-sub { background: var(--accent); color: var(--main); }
+        .btn-main { background: var(--main); color: #fff; -webkit-text-fill-color: #fff; }
+        .btn-sub { background: var(--accent); color: var(--main); -webkit-text-fill-color: var(--main); }
 
-        footer { margin-top: 50px; }
+        footer { margin-top: 30px; text-align: center; }
+        .footer-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
         .kofi-btn {
-            display: inline-flex;
-            background: var(--main);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 10px;
+            width: 100%; background: var(--main); color: #fff; padding: 16px;
+            border-radius: var(--radius); text-decoration: none; font-weight: 900; font-size: 0.9rem;
+            -webkit-text-fill-color: #fff;
         }
-        .add-home-btn {
-            display: inline-block;
-            background: var(--accent);
-            color: var(--main);
-            padding: 12px 24px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 25px;
-            cursor: pointer;
+        .home-btn {
+            width: 100%; background: var(--accent); color: var(--main); padding: 14px;
+            border-radius: var(--radius); font-weight: 800; font-size: 0.85rem;
+            cursor: pointer; border: none; -webkit-appearance: none;
         }
+
+        .legal { font-size: 0.7rem; color: #bbb; line-height: 1.6; font-weight: 600; }
+        .legal a { color: inherit; text-decoration: underline; }
 
         /* Modal */
         .modal {
-            display: none;
-            position: fixed;
+            display: none; position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            align-items: center; justify-content: center;
-            z-index: 1000;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center;
+            z-index: 1000; backdrop-filter: blur(4px);
         }
         .modal-content {
-            background: #fff;
-            padding: 30px;
-            border-radius: 25px;
-            width: 85%;
-            max-width: 320px;
-            text-align: left;
-            position: relative;
+            background: #fff; padding: 35px; border-radius: var(--radius);
+            width: 85%; max-width: 340px; text-align: left; position: relative;
         }
-        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; color: #ccc; cursor: pointer; }
-        .modal-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 15px; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #ccc; cursor: pointer; }
+        .modal-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; }
 
-        /* Toast */
         #toast {
-            position: fixed;
-            bottom: 30px;
-            background: var(--main);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            display: none;
-            z-index: 2000;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--main); color: #fff; padding: 10px 20px;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 800;
+            display: none; z-index: 2000; animation: fadeIn 0.3s;
         }
-
-        .legal { font-size: 10px; color: #ccc; line-height: 1.6; margin-top: 20px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -10px); } to { opacity: 1; transform: translate(-50%, 0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>JSON Key Picker</h1>
-    <p class="subtitle">Extract specific keys from your JSON data.</p>
+    <header>
+        <h1>JSON Key Picker</h1>
+        <a href="https://afrorakda.github.io/" class="hub-link">🏠 Hub</a>
+    </header>
+    <p class="subtitle">Extract specific keys from JSON.</p>
 
-    <div class="label-group"><span>Paste JSON Here</span></div>
-    <textarea id="input" oninput="analyze()" placeholder='{"id":1, "status":"ok"}'></textarea>
+    <div class="label-group"><span>Paste JSON</span></div>
+    <div class="input-wrapper">
+        <textarea id="input" oninput="analyze()" placeholder='{"id": 1, "name": "Item", "status": "ok"}'></textarea>
+        <button id="clr-input" class="clr-btn" onclick="clearAll()">×</button>
+    </div>
 
     <div id="pickerArea">
-        <div class="label-group"><span>Pick Keys</span></div>
+        <div class="label-group"><span>Select Keys to Keep</span></div>
         <div id="keyContainer"></div>
     </div>
 
     <div class="label-group"><span>Result</span></div>
-    <textarea id="output" readonly placeholder="Result will appear here..."></textarea>
+    <textarea id="output" readonly placeholder="Pick keys above..."></textarea>
 
     <div class="btn-group">
-        <button class="btn btn-sub" onclick="location.reload()">Clear</button>
+        <button class="btn btn-sub" onclick="clearAll()">Clear</button>
         <button class="btn btn-main" onclick="copyResult()">Copy Result</button>
     </div>
 
     <footer>
-        <a href="https://ko-fi.com/afrorakda" class="kofi-btn">☕ Support me on Ko-fi</a><br>
-        <div class="add-home-btn" onclick="toggleModal(true)">Add to Home Screen</div>
-        <p class="legal">No login / No tracking / No ads / Browser only<br>Privacy Policy / afrorakda © 2026</p>
+        <div class="footer-btns">
+            <a href="https://ko-fi.com/afrorakda" target="_blank" class="kofi-btn">☕️buy me a coffee</a>
+            <button class="home-btn" onclick="toggleModal(true)">Add to Home Screen</button>
+        </div>
+        <p class="legal">
+            No login / No tracking / No ads / Browser only<br>
+            <a href="https://afrorakda.com/privacy/">Privacy Policy</a> / afrorakda © 2026
+        </p>
     </footer>
 </div>
 
@@ -174,9 +187,9 @@
     <div class="modal-content" onclick="event.stopPropagation()">
         <span class="modal-close" onclick="toggleModal(false)">×</span>
         <div class="modal-title">📱 Install</div>
-        <p>Add to home screen.</p>
-        <p><strong>🍏 iPhone:</strong> Share > Add to Home Screen</p>
-        <p><strong>🤖 Android:</strong> Menu > Add to home screen</p>
+        <p style="font-size:0.9rem; font-weight:600; color:#666; line-height:1.5;">Add JSON Key Picker to your home screen.</p>
+        <p style="font-size:0.85rem; margin-top:15px;"><strong>🍏 iPhone:</strong> Share > Add to Home Screen</p>
+        <p style="font-size:0.85rem; margin-top:10px;"><strong>🤖 Android:</strong> Menu > Add to Home Screen</p>
     </div>
 </div>
 
@@ -185,28 +198,46 @@
     let selectedKeys = new Set();
 
     function analyze() {
-        const val = document.getElementById('input').value.trim();
+        const inputEl = document.getElementById('input');
+        const val = inputEl.value.trim();
         const picker = document.getElementById('pickerArea');
-        if(!val) { picker.style.display = 'none'; return; }
+        const clrBtn = document.getElementById('clr-input');
+        
+        clrBtn.style.display = val ? 'flex' : 'none';
+
+        if(!val) { 
+            picker.style.display = 'none'; 
+            document.getElementById('output').value = '';
+            return; 
+        }
+
         try {
             rawData = JSON.parse(val);
             const sample = Array.isArray(rawData) ? rawData[0] : rawData;
             const container = document.getElementById('keyContainer');
-            container.innerHTML = '';
-            selectedKeys.clear();
-            Object.keys(sample).forEach(key => {
-                const chip = document.createElement('div');
-                chip.className = 'key-chip';
-                chip.textContent = key;
-                chip.onclick = () => {
-                    chip.classList.toggle('selected');
-                    selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key);
-                    update();
-                };
-                container.appendChild(chip);
-            });
+            
+            // キーが変わった場合のみ再描画
+            const currentKeys = Object.keys(sample).join(',');
+            if (container.dataset.lastKeys !== currentKeys) {
+                container.innerHTML = '';
+                selectedKeys.clear();
+                Object.keys(sample).forEach(key => {
+                    const chip = document.createElement('div');
+                    chip.className = 'key-chip';
+                    chip.textContent = key;
+                    chip.onclick = () => {
+                        chip.classList.toggle('selected');
+                        selectedKeys.has(key) ? selectedKeys.delete(key) : selectedKeys.add(key);
+                        update();
+                    };
+                    container.appendChild(chip);
+                });
+                container.dataset.lastKeys = currentKeys;
+            }
             picker.style.display = 'block';
-        } catch(e) { picker.style.display = 'none'; }
+        } catch(e) { 
+            picker.style.display = 'none'; 
+        }
     }
 
     function update() {
@@ -220,17 +251,37 @@
         document.getElementById('output').value = selectedKeys.size ? JSON.stringify(result, null, 2) : '';
     }
 
+    function clearAll() {
+        document.getElementById('input').value = '';
+        document.getElementById('output').value = '';
+        document.getElementById('keyContainer').innerHTML = '';
+        document.getElementById('keyContainer').dataset.lastKeys = '';
+        selectedKeys.clear();
+        analyze();
+    }
+
     function copyResult() {
         const out = document.getElementById('output');
         if(!out.value) return;
-        out.select();
-        document.execCommand('copy');
-        const toast = document.getElementById('toast');
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 2000);
+        navigator.clipboard.writeText(out.value).then(() => {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        });
     }
 
     function toggleModal(s) { document.getElementById('homeModal').style.display = s ? 'flex' : 'none'; }
+
+    async function loadFooter() {
+        try {
+            const res = await fetch('footer.json');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.kofi) document.querySelector('.kofi-btn').textContent = data.kofi.text;
+            }
+        } catch (e) {}
+    }
+    window.onload = loadFooter;
 </script>
 
 </body>
